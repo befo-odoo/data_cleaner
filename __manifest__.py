@@ -7,7 +7,9 @@
     "category": "Custom Development",
     "depends": [],
     "data": [
-        "views/data_cleaner_views.xml"
+        "views/data_cleaner_views.xml",
+        "security/data_cleaner_groups.xml",
+        "security/ir.model.access.csv"
     ],
     "website": "www.odoo.com",
     "application": True,

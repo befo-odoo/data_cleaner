@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_cleaner_user" model="res.groups">
+        <field name="name">Data Cleaner/User</field>
+    </record>
+    <record id="group_cleaner_admin" model="res.groups">
+        <field name="name">Data Cleaner/Admin</field>
+        <field name="implied_ids" eval="[Command.link(ref('group_cleaner_user'))]"/>
+    </record>
+</odoo>

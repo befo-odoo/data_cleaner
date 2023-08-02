@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Form View Definition -->
+        <record id="view_data_cleaner_form" model="ir.ui.view">
+            <field name="name">data_cleaner.data_cleaner_view</field>
+            <field name="model">data.cleaner</field>
+            <field name="arch" type="xml">
+                <form>
+                    
+                </form>
+            </field>
+        </record>
+
+        <!-- Action Window Definition -->
+        <record model="ir.actions.act_window" id="data_cleaner_action">
+            <field name="name">Data Cleaner</field>
+            <field name="res_model">data.cleaner</field>
+            <field name="view_mode">form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    
+                </p>
+            </field>
+        </record>
+
+        <!-- Action Menu Item Related To Above Action Window -->
+        <menuitem name="Data Cleaner"
+                  id="menu_data_cleaner"
+                  sequence="1"
+                  web_icon="data_cleaner,static/description/icon.png"
+                  action="data_cleaner_action">
+
+            <menuitem id="menu_data_cleaner_sub" name="Upload" sequence="2">
+                <menuitem id="menu_sub_data_cleaner_sub" name="Create" sequence="3"/>
+            </menuitem>
+        </menuitem>
+    </data>
+</odoo>

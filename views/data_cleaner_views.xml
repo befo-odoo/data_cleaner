@@ -7,11 +7,9 @@
             <field name="model">data.cleaner</field>
             <field name="arch" type="xml">
                 <form>
-                    <header>
-                        <field name="loaded" invisible="1"/>
-                        <button name="import_csv" class="btn-primary" type="object" attrs="{'invisible': [('loaded','=', 'True')]}">Import</button>
-                        <button name="export_csv" class="btn-primary" type="object" attrs="{'invisible': [('loaded','=', 'False')]}">Export</button>
-                    </header>
+                    <field name='file'/>
+                    <field name="file_loaded" invisible="1"/>
+                    <button name="export_csv" class="mx-2 btn-primary" type="object" attrs="{'invisible': [('file_loaded','=', False)]}">Export</button>
                 </form>
             </field>
         </record>

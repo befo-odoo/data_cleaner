@@ -6,10 +6,10 @@
             <field name="name">data_cleaner.data_cleaner_view</field>
             <field name="model">data.cleaner</field>
             <field name="arch" type="xml">
-                <form>
+               <form>
                     <field name='file'/>
                     <field name="file_loaded" invisible="1"/>
-                    <button name="export_csv" class="mx-2 btn-primary" type="object" attrs="{'invisible': [('file_loaded','=', False)]}">Export</button>
+                    <button name="download_cleaned_csv" string="Export" type="object" attrs="{'invisible': [('file_loaded','=', False)]}"/>
                 </form>
             </field>
         </record>

@@ -9,7 +9,7 @@
                <form>
                     <field name='file'/>
                     <field name="file_loaded" invisible="1"/>
-                    <button name="download_cleaned_csv" string="export_csv" type="object" attrs="{'invisible': [('file_loaded','=', False)]}"/>
+                    <button name="download_cleaned_csv" string="Export" type="object" attrs="{'invisible': [('file_loaded','=', False)]}"/>
                 </form>
             </field>
         </record>

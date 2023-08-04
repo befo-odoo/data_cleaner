@@ -9,17 +9,11 @@ class DataCleaner(models.Model):
     cleaned_csv = fields.Char(default='Test')
     exportable_csv = fields.Binary()
 
-    # Import a file, set its loaded status
-    def import_csv(self):
-        for record in self:
-            record.file = None #TODO [upload and set file]
-            # record.file_loaded = True
-
     # Export the formatted file and set variables back to default
     def export_csv(self):
         res = self.download_cleaned_csv()
         self.file = None
-        # self.file_loaded = False
+        self.file_loaded = False
         return res
 
     # Generate the CSV file from the cleaned data and execute download

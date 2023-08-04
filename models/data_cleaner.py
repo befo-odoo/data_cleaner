@@ -50,6 +50,6 @@ class DataCleaner(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'cleaner.spec',
-            'view_id': self.env.ref('test_module.test_wizard_view').id,
+            'view_id': self.env.ref('data_cleaner.cleaner_spec_view)').id,
             'target': 'new',
                 }

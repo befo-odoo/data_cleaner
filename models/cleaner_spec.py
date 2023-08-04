@@ -3,6 +3,7 @@ class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation'
 
+    place = fields.Char()
     attrs = fields.One2many(
         string='Attributes', 
         comodel_name='cleaner.spec.val',

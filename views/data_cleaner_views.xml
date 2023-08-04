@@ -9,8 +9,9 @@
                <form>
                     <field name='file'/>
                     <field name="file_loaded" invisible="1"/>
-                    <button name="export_csv" string="Export" type="object" />
-                        <!-- attrs="{'invisible': [('file_loaded','=', False)]}" -->
+                    <button name="export_csv" string="Export" type="object"/>
+                    <!-- attrs="{'invisible': [('file_loaded','=', False)]}"
+                    attrs="{'invisible': [('file_loaded','=', True)]}" -->
                 </form>
             </field>
         </record>

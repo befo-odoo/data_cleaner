@@ -2,7 +2,7 @@ from odoo import models, api, fields
 class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation'
-    
+
     attrs = fields.One2many(
         string='Attributes', 
         comodel_name='cleaner.spec.val',
@@ -18,6 +18,8 @@ class CleanerSpec(models.TransientModel):
 
     # Process dirty data into correct structure for exporting
     def process_data(self, data):
+        # First, determine which row stores the product
+        print(data)
         # Group attributes by product:
         #
         # [
@@ -48,7 +50,7 @@ class CleanerSpecColumn(models.Model):
 
     # Receive a column and process it
     def process_column(self, col_data):
-        if self.column_type is 'attribute':
+        if self.column_type == 'attribute':
             return
 
 class CleanerSpecAttr(models.Model):

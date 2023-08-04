@@ -1,5 +1,7 @@
 from odoo import api, fields, models
+import csv
 import base64
+import io
 class DataCleaner(models.Model):
     _name = 'data.cleaner'
     _description = 'Tool for importing and cleaning client data'
@@ -14,8 +16,15 @@ class DataCleaner(models.Model):
         # Only trigger wizard if file is added, not removed
         if self.file:
             print('trigger wizard here')
+            data = self.decode_file()
+            self.env['cleaner.spec'].process_data(data)
             # Since a file was added, mark it as loaded
             self.file_loaded = True
+
+    # Decode file data for processing
+    def decode_file(self):
+        buf = io.StringIO(base64.b64decode(self.file).decode('utf-8'))
+        return csv.DictReader(buf)
 
     # Export the formatted file and set variables back to default
     def export_csv(self):

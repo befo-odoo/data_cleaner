@@ -4,7 +4,7 @@ class DataCleaner(models.Model):
     _name = 'data.cleaner'
     _description = 'Tool for importing and cleaning client data'
     
-    file_loaded = fields.Boolean(string="File Loaded", default=False)
+    file_loaded = fields.Boolean(string="File Loaded", default=True)
     file = fields.Binary(string="Uploaded File")
     cleaned_csv = fields.Char(default='Test')
     exportable_csv = fields.Binary()
@@ -13,17 +13,16 @@ class DataCleaner(models.Model):
     def import_csv(self):
         for record in self:
             record.file = None #TODO [upload and set file]
-            record.file_loaded = True
-
+            # record.file_loaded = True
 
     # Export the formatted file and set variables back to default
     def export_csv(self):
-        for record in self:
-            #TODO [download file here]
-            record.file = None
-            record.loaded = False
+        res = self.download_cleaned_csv()
+        self.file = None
+        # self.file_loaded = False
+        return res
 
-
+    # Generate the CSV file from the cleaned data and execute download
     def download_cleaned_csv(self):
         self.exportable_csv = base64.b64encode(bytes(self.cleaned_csv, encoding='utf8'))
         return {

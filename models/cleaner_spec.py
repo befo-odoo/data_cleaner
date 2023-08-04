@@ -2,8 +2,21 @@ from odoo import models, api, fields
 class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation'
+    
+    attrs = fields.One2many(
+        string='Attributes', 
+        comodel_name='cleaner.spec.val',
+        inverse_name='val'
+    )
+    vals = fields.Many2many(
+        string='Values', 
+        comodel_name='cleaner.spec.attr', 
+        relation='attr_val_pairs', 
+        column1='value', 
+        column2='attribute'
+    )
 
-    # Process data into correct structure for exporting
+    # Process dirty data into correct structure for exporting
     def process_data(self, data):
         # Group attributes by product:
         #
@@ -19,6 +32,10 @@ class CleanerSpec(models.TransientModel):
         # ]
         #
         return
+    
+    # Generate clean csv file for importing
+    def generate_csv(self):
+        return "test,test1"
 
 class CleanerSpecColumn(models.Model):
     _name = 'cleaner.spec.column'
@@ -28,19 +45,6 @@ class CleanerSpecColumn(models.Model):
         ('attribute', 'Attribute'),
         ('none', 'Not an attribute')],
         string='Request Type')
-    
-    attrs = fields.One2many(
-        string='Attributes', 
-        comodel_name='cleaner.spec.val',
-        inverse_name='val'
-    )
-    vals = fields.Many2many(
-        string='Values', 
-        comodel_name='cleaner.spec.attr', 
-        relation='attr_val_pairs', 
-        column1='value', 
-        column2='attribute'
-    )
 
     # Receive a column and process it
     def process_column(self, col_data):

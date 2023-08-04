@@ -10,9 +10,6 @@
                     <field name='file'/>
                     <field name="file_loaded" invisible="1"/>
                     <button name="export_csv" string="Export" type="object"/>
-                    <!-- <button name="%(cleaner_spec_action)d" string="Open Wizard" type="action"/> -->
-                    <!-- <button name="action_open_wizard" string="Open Wizard" type="object"/> -->
-                    <!-- attrs="{'invisible': [('file_loaded','=', False)]}" -->
                 </form>
             </field>
         </record>

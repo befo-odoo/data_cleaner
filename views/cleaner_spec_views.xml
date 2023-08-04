@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Form View Definition -->
+        <record id="view_cleaner_spec_form" model="ir.ui.view">
+            <field name="name">cleaner_spec.cleaner_spec_view</field>
+            <field name="model">cleaner.spec</field>
+            <field name="arch" type="xml">
+               <form>
+                    <field name='place'/>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

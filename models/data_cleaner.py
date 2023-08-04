@@ -25,3 +25,14 @@ class DataCleaner(models.Model):
             'url': f'/web/content/?model=data.cleaner&id={self.id}&field=exportable_csv&filename=cleaned_csv.csv&download=true',
             'target': 'self',
         }
+
+    def action_open_wizard(self):
+        return {
+            'name': "Cleaner Spec",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'cleaner.spec',
+            'view_id': self.env.ref('test_module.test_wizard_view').id,
+            'target': 'new',
+                }

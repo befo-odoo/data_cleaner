@@ -9,18 +9,12 @@
                <form>
                     <field name='file'/>
                     <field name="file_loaded" invisible="1"/>
+                    <button name="open_wizard" string="Map Fields" type="object"/>
                     <button name="export_csv" string="Export" type="object"/>
                 </form>
             </field>
         </record>
-
-        <!-- Action Open Wizard Definition
-        <record model="ir.actions.act_window" id="cleaner_spec_action">
-            <field name="name">Cleaner spec</field>
-            <field name="res_model">cleaner.spec</field>
-            <field name="view_mode">form</field>
-        </record> -->
-
+        
         <!-- Action Window Definition -->
         <record model="ir.actions.act_window" id="data_cleaner_action">
             <field name="name">Data Cleaner</field>

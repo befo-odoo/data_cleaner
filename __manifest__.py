@@ -7,6 +7,7 @@
     "category": "Custom Development",
     "depends": [ "base_import" ],
     "data": [
+        "views/cleaner_spec_views.xml",
         "views/data_cleaner_views.xml",
         "security/data_cleaner_groups.xml",
         "security/ir.model.access.csv"

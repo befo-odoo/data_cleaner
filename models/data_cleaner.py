@@ -1,8 +1,6 @@
 from odoo import api, fields, models
-import csv
+from io import StringIO
 import base64
-import io
-import json
 class DataCleaner(models.Model):
     _name = 'data.cleaner'
     _description = 'Tool for importing and cleaning client data'
@@ -34,8 +32,8 @@ class DataCleaner(models.Model):
         return wizard_view
 
     # Decode file data for processing
-    def decode_file(self):
-        return io.StringIO(base64.b64decode(self.file).decode('utf-8'))
+    def decode_file(self) -> StringIO:
+        return StringIO(base64.b64decode(self.file).decode('utf-8'))
 
     # Export the formatted file and set variables back to default
     def export_csv(self):

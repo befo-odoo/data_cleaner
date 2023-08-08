@@ -9,6 +9,7 @@
                <form>
                     <field name='file'/>
                     <field name="file_loaded" invisible="1"/>
+                    <button name="open_wizard" string="Map Fields" type="object"/>
                     <button name="export_csv" string="Export" type="object"/>
                 </form>
             </field>

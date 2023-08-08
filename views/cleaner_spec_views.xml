@@ -7,7 +7,12 @@
             <field name="model">cleaner.spec</field>
             <field name="arch" type="xml">
                <form>
-                    <field name='place'/>
+                    <group>
+                        <field name='product_header'/>
+                    </group>
+                    <group>
+                        <field name="cols" widget="html" options='{"rendering": "raw"}'/>
+                    </group>
                 </form>
             </field>
         </record>

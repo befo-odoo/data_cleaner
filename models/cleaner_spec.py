@@ -1,23 +1,18 @@
 from odoo import models, api, fields
-import pandas
+from xml.etree import ElementTree as etree
+from csv import DictReader
+from io import StringIO
+import json
 class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
-    _description = 'data cleaner specificiation'
+    _description = 'data cleaner specificiation wizard'
 
-    place = fields.Char()
-    product_header = fields.Char(string="Product Header")
-    attrs = fields.One2many(
-        string='Attributes', 
-        comodel_name='cleaner.spec.val',
-        inverse_name='val'
-    )
-    vals = fields.Many2many(
-        string='Values', 
-        comodel_name='cleaner.spec.attr', 
-        relation='attr_val_pairs', 
-        column1='value', 
-        column2='attribute'
-    )
+    # place = fields.Char()
+    
+    product_header = fields.Char(string="CSV Header for Product")
+    cols = fields.Char(string='Columns')
+    attrs = fields.Char(string='Attributes')
+    vals = fields.Char(string='Values')
 
     # Process dirty data into correct structure for exporting
     #
@@ -34,16 +29,39 @@ class CleanerSpec(models.TransientModel):
     #   }
     # ]
     #
-    def process_data(self, data):
-        # First, loop through all row headers and determine which stores the product, and which are attributes
-        for header in data.fieldnames:
-            if True:
-                #trigger if column is product header
-                self.product_header = header
-            if True:
-                #trigger if column is attribute
-                self.attrs.write({'attr': header})
+    def process_data(self):
+        serialized_data = self.env['ir.actions.act_window'].search([('name', '=', 'data.mapping.wizard')]).context
+        print(serialized_data)
+        data = DictReader(StringIO(json.loads(serialized_data)))
+        self.process_headers(data)
+        self.process_rows(data)
+
+    def process_headers(self, data):
+        # Add variable number of column names to wizard
+        self.ensure_one()
+        fields_view = self.env.ref('data_cleaner.view_cleaner_spec_form')
+        arch = etree.fromstring(fields_view.arch)
+
+        # Loop through all row headers and determine which stores the product, and which are attributes
+        for header in self.data.fieldnames:
+            # Trigger if column is product header
+            if True: self.product_header = header
+            # Trigger if column is attribute
+            if True: self.attrs.write({'attr': header})
+            # Add header to list of column names
+            self.cols.write(header)
         
+        for index, field_value in enumerate(self.cols, start=1):
+            field_name = f'dynamic_field_{index}'
+            field = etree.Element('field', {'name': field_name})
+            arch.append(field)
+
+        fields_view.arch = etree.tostring(arch)
+        return
+    
+    def process_rows(self, data):
+        for row in self.data:
+            print(row)
         return
     
     # Generate clean csv file for importing
@@ -54,16 +72,16 @@ class CleanerSpecColumn(models.Model):
     _name = 'cleaner.spec.column'
     _description = 'data cleaner specificiation column'
 
-#     column_type = fields.Selection([
-#         ('product_id', 'Product ID'),
-#         ('attribute', 'Attribute'),
-#         ('none', 'Not an attribute')],
-#         string='Request Type')
+    # column_type = fields.Selection([
+    #     ('product_id', 'Product ID'),
+    #     ('attribute', 'Attribute'),
+    #     ('none', 'Not an attribute')],
+    #     string='Request Type')
 
-#     # Receive a column and process it
-#     def process_column(self, col_data):
-#         if self.column_type == 'attribute':
-#             return
+    # # Receive a column and process it
+    # def process_column(self, col_data):
+    #     if self.column_type == 'attribute':
+    #         return
 
 class CleanerSpecAttr(models.Model):
     _name = 'cleaner.spec.attr'

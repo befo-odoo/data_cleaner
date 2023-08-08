@@ -73,16 +73,19 @@ class CleanerSpec(models.TransientModel):
         new_col_list = [col_name for col_name in df.columns.values if col_name not in attribute_array]
         updated_col_list = new_col_list.copy()
         updated_col_list.extend(["Attribute", "Values"])
-        updated_df = pd.DataFrame(columns=updated_col_list)
-        j = 0
+        df_dict = {c: [] for c in updated_col_list}
         for index, row in df.iterrows():
-            print("Processing Row " + str(j))
-            j = j + 1
-            first_row = {col: row[col] for col in new_col_list}
-            first_row['Attribute'] = attribute_array[0]
-            first_row['Values'] = row[attribute_array[0]]
-            updated_df = pd.concat([updated_df, pd.DataFrame([first_row])], ignore_index=True)
+            print("Processing Row " + str(index))
+            for col in new_col_list:
+                df_dict[col].append(row[col])
+            df_dict['Attribute'].append(attribute_array[0])
+            df_dict['Values'].append(row[attribute_array[0]])
             for i in range(1, len(attribute_array)):
-                temp_dict = {'Attribute': attribute_array[i], 'Values': row[attribute_array[i]]}
-                updated_df = pd.concat([updated_df, pd.DataFrame([temp_dict])], ignore_index=True)
-        return updated_df.to_csv(index=False)
+                df_dict['Attribute'].append(attribute_array[i])
+                df_dict['Values'].append(row[attribute_array[i]])
+                for col in new_col_list:
+                    df_dict[col].append('')
+                
+        return pd.DataFrame(df_dict).to_csv("Updated_csv.csv")
+    
+    

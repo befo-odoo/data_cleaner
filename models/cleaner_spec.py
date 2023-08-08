@@ -86,6 +86,6 @@ class CleanerSpec(models.TransientModel):
                 for col in new_col_list:
                     df_dict[col].append('')
                 
-        return pd.DataFrame(df_dict).to_csv("Updated_csv.csv")
+        return pd.DataFrame(df_dict).to_csv()
     
     

@@ -8,9 +8,9 @@ class CleanerSpec(models.TransientModel):
     _description = 'data cleaner specificiation wizard'
 
     product_header = fields.Char(string="CSV Header for Product")
-    cols = fields.Char(string='Columns')
-    attrs = fields.Char(string='Attributes')
-    vals = fields.Char(string='Values')
+    cols = fields.Char(string='Columns', default='')
+    attrs = fields.Char(string='Attributes', default='')
+    vals = fields.Char(string='Values', default='')
 
     # Process dirty data into correct structure for exporting
     # Group attributes by product:
@@ -24,25 +24,26 @@ class CleanerSpec(models.TransientModel):
     #       attr2: [val5, val8]
     #   },
     # ]
-    def process_data(self):
-        serialized_data = r"{}".format(self.env['ir.actions.act_window'].search([('name', '=', 'data.mapping.wizard')]).context.replace("\'", "\""))
-        data = DictReader(StringIO(json.loads(serialized_data)))
+    def process_data(self, data):
         self.process_headers(data)
 
     def process_headers(self, data):
         # Add variable number of column names to wizard
-        self.ensure_one()
+        # self.ensure_one()
         fields_view = self.env.ref('data_cleaner.view_cleaner_spec_form')
         arch = etree.fromstring(fields_view.arch)
 
         # Loop through all row headers and determine which stores the product, and which are attributes
-        for header in self.data.fieldnames:
+        for header in data.fieldnames:
             # Trigger if column is product header
             if True: self.product_header = header
             # Trigger if column is attribute
-            if True: self.attrs.write({'attr': header})
+            if True: self.attrs += header + ','
             # Add header to list of column names
-            self.cols.write(header)
+            self.cols += header
+
+        # Strip trailing comma
+        self.attrs = self.attrs[:-1]
         
         for index, field_value in enumerate(self.cols, start=1):
             field_name = f'dynamic_field_{index}'

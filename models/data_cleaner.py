@@ -20,24 +20,22 @@ class DataCleaner(models.Model):
 
     # Load data and build wizard
     def open_wizard(self):
-        serialized_data = json.dumps(list(self.decode_file()))
+        data = self.decode_file()
         wizard_view = self.env['ir.actions.act_window'].create({
             'name': 'data.mapping.wizard',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
             'res_model': 'cleaner.spec',
             'view_id': self.env.ref('data_cleaner.view_cleaner_spec_form').id,
-            "context": serialized_data,
             'target': 'new',
         })
         spec = self.env['cleaner.spec'].create({})
-        spec.process_data()
+        spec.process_data(data)
         return wizard_view
 
     # Decode file data for processing
     def decode_file(self):
-        buf = io.StringIO(base64.b64decode(self.file).decode('utf-8'))
-        return csv.DictReader(buf)
+        return io.StringIO(base64.b64decode(self.file).decode('utf-8'))
 
     # Export the formatted file and set variables back to default
     def export_csv(self):

@@ -30,8 +30,8 @@ class CleanerSpec(models.TransientModel):
     # ]
     #
     def process_data(self):
-        serialized_data = self.env['ir.actions.act_window'].search([('name', '=', 'data.mapping.wizard')]).context
-        print(serialized_data)
+        serialized_data = self.env['ir.actions.act_window'].search([('name', '=', 'data.mapping.wizard')]).context.replace("\'", "\"")
+        serialized_data = r"{}".format(serialized_data)
         data = DictReader(StringIO(json.loads(serialized_data)))
         self.process_headers(data)
         self.process_rows(data)

@@ -27,7 +27,7 @@ class DataCleaner(models.Model):
             'view_mode': 'form',
             'res_model': 'cleaner.spec',
             'view_id': self.env.ref('data_cleaner.view_cleaner_spec_form').id,
-            'context': {'data': serialized_data},
+            "context": serialized_data,
             'target': 'new',
         })
         spec = self.env['cleaner.spec'].create({})

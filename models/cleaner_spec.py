@@ -7,17 +7,13 @@ class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation wizard'
 
-    # place = fields.Char()
-    
     product_header = fields.Char(string="CSV Header for Product")
     cols = fields.Char(string='Columns')
     attrs = fields.Char(string='Attributes')
     vals = fields.Char(string='Values')
 
     # Process dirty data into correct structure for exporting
-    #
     # Group attributes by product:
-    #
     # [
     #   prod1: {
     #       attr1: [val1, val2, val3],
@@ -26,15 +22,12 @@ class CleanerSpec(models.TransientModel):
     #   prod2: {
     #       attr1: [val1, val6, val7],
     #       attr2: [val5, val8]
-    #   }
+    #   },
     # ]
-    #
     def process_data(self):
-        serialized_data = self.env['ir.actions.act_window'].search([('name', '=', 'data.mapping.wizard')]).context.replace("\'", "\"")
-        serialized_data = r"{}".format(serialized_data)
+        serialized_data = r"{}".format(self.env['ir.actions.act_window'].search([('name', '=', 'data.mapping.wizard')]).context.replace("\'", "\""))
         data = DictReader(StringIO(json.loads(serialized_data)))
         self.process_headers(data)
-        self.process_rows(data)
 
     def process_headers(self, data):
         # Add variable number of column names to wizard
@@ -59,36 +52,6 @@ class CleanerSpec(models.TransientModel):
         fields_view.arch = etree.tostring(arch)
         return
     
-    def process_rows(self, data):
-        for row in self.data:
-            print(row)
-        return
-    
     # Generate clean csv file for importing
     def generate_csv(self):
         return "test,test1"
-
-class CleanerSpecColumn(models.Model):
-    _name = 'cleaner.spec.column'
-    _description = 'data cleaner specificiation column'
-
-    # column_type = fields.Selection([
-    #     ('product_id', 'Product ID'),
-    #     ('attribute', 'Attribute'),
-    #     ('none', 'Not an attribute')],
-    #     string='Request Type')
-
-    # # Receive a column and process it
-    # def process_column(self, col_data):
-    #     if self.column_type == 'attribute':
-    #         return
-
-class CleanerSpecAttr(models.Model):
-    _name = 'cleaner.spec.attr'
-    _description = 'cleaner specification attribute'
-    attr = fields.Char(string='Attribute')
-
-class CleanerSpecVal(models.Model):
-    _name = 'cleaner.spec.val'
-    _description = 'cleaner specification value'
-    val = fields.Char(string='Value')

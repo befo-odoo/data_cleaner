@@ -10,16 +10,11 @@ class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation wizard'
 
-    # product_header = fields.Selection(selection=[('','')], string="CSV Header for Product")
-    product_header = fields.Char(string="Product ID")
+    product_header = fields.Many2one(comodel_name='cleaner.spec.column', string="Product Column Header", ondelete='cascade')
     cols = fields.Char(string='Columns', default='')
     attrs = fields.Char(string='Attributes', default='')
     vals = fields.Char(string='Values', default='')
-
-    parent = fields.Many2one(comodel_name='data.cleaner', string='Parent Object')
-
-
-
+    
     # Process dirty data into correct structure for exporting
     # Group attributes by product:
     # [
@@ -60,14 +55,19 @@ class CleanerSpec(models.TransientModel):
         
         # Build variable number of fields
         for index, field_name in enumerate(self.cols.split(','), start=1):
-            label = etree.Element('h6')
+            field = etree.Element('input', {'type': 'checkbox', 'id': f'attr{index}', 'class': 'cleaner_spec_inl_el'})
+            arch.append(field)
+            label = etree.Element('h6', {'class': 'cleaner_spec_inl_el'})
             label.text = field_name
             arch.append(label)
-            field = etree.Element('input', {'type': 'checkbox', 'id': f'attr{index}'})
-            arch.append(field)
+            arch.append(etree.Element('br'))
 
         # Assign variable number of fields architecture to the view
         fields_view.arch = etree.tostring(arch)
+
+    def _get_headers(self):
+        if self.cols:
+            return self.cols
 
     # Generate clean csv file for importing
     def generate_csv(self, data):

@@ -12,8 +12,6 @@ class DataCleaner(models.Model):
     cleaned_csv = fields.Char(default='Test')
     exportable_csv = fields.Binary()
     
-    specs = fields.One2many(comodel_name='cleaner.spec', inverse_name='parent', string='Data Specifications')
-
     # Update loaded status for field visibility
     @api.onchange('file')
     def _onchange_file(self):
@@ -24,7 +22,6 @@ class DataCleaner(models.Model):
         self.ensure_one
         data = self.decode_file()
         spec = self.env['cleaner.spec'].create({})
-        spec.parent = self.id
         spec.process_data(data)
         return {
             'name': 'data.mapping.wizard',

@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                <form>
                     <group>
-                        <separator string="Product Header"/>
+                        <separator string="Select a column for Product ID"/>
                         <field name='product_header'/>
                     </group>
                     <group>

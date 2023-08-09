@@ -8,11 +8,11 @@
             <field name="arch" type="xml">
                <form>
                     <group>
-                        <field name='product_header'/>
+
                     </group>
-                    <group>
-                        <field name="cols" widget="html" options='{"rendering": "raw"}'/>
-                    </group>
+                    <footer>
+                        <button name="confirm_mappings" string="Confirm" class="btn-primary" type="object"/>
+                    </footer>
                 </form>
             </field>
         </record>

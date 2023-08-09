@@ -7,14 +7,14 @@
             <field name="model">data.cleaner</field>
             <field name="arch" type="xml">
                <form>
-                    <field name='file'/>
                     <field name="file_loaded" invisible="1"/>
-                    <button name="open_wizard" string="Map Fields" type="object"/>
-                    <button name="export_csv" string="Export" type="object"/>
+                    <field name='file' attrs="{'invisible': [('file_loaded', '=', True)]}"/>
+                    <button name="open_wizard" string="Map Fields" class="btn-primary" type="object" attrs="{'invisible': [('file_loaded', '=', False)]}"/>
+                    <button name="export_csv" string="Export" type="object" attrs="{'invisible': [('file_loaded', '=', False)]}"/>
                 </form>
             </field>
         </record>
-        
+
         <!-- Action Window Definition -->
         <record model="ir.actions.act_window" id="data_cleaner_action">
             <field name="name">Data Cleaner</field>

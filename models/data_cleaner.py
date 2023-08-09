@@ -1,18 +1,19 @@
 from odoo import api, fields, models
-import csv
-import base64
-import io
-import json
+from io import StringIO
+from base64 import b64decode, b64encode
+
 class DataCleaner(models.Model):
     _name = 'data.cleaner'
     _description = 'Tool for importing and cleaning client data'
     
-    file_loaded = fields.Boolean(string="File Loaded", default=False)
+    file_loaded = fields.Boolean(string="Is File Loaded", default=False)
     file = fields.Binary(string="Uploaded File")
     csv_data = fields.Char(string="Unformatted CSV Data")
     cleaned_csv = fields.Char(default='Test')
     exportable_csv = fields.Binary()
 
+    specs = fields.Many2one(comodel_name='cleaner.spec', string='Cleaner Specs')
+    
     # Update loaded status for field visibility
     @api.onchange('file')
     def _onchange_file(self):
@@ -20,35 +21,34 @@ class DataCleaner(models.Model):
 
     # Load data and build wizard
     def open_wizard(self):
-        serialized_data = json.dumps(list(self.decode_file()))
-        wizard_view = self.env['ir.actions.act_window'].create({
-            'name': 'data.mapping.wizard',
+        self.ensure_one
+        spec = self.env['cleaner.spec'].create({'parent': self})
+        spec.process_data(self.decode_file())
+        return {
+            'name': 'Select Columns that are Product Attributes',
             'type': 'ir.actions.act_window',
-            'view_mode': 'form',
             'res_model': 'cleaner.spec',
+            'view_mode': 'form',
             'view_id': self.env.ref('data_cleaner.view_cleaner_spec_form').id,
-            "context": serialized_data,
             'target': 'new',
-        })
-        spec = self.env['cleaner.spec'].create({})
-        spec.process_data()
-        return wizard_view
+        }
 
     # Decode file data for processing
-    def decode_file(self):
-        buf = io.StringIO(base64.b64decode(self.file).decode('utf-8'))
-        return csv.DictReader(buf)
+    def decode_file(self) -> StringIO:
+        return StringIO(b64decode(self.file).decode('utf-8'))
 
     # Export the formatted file and set variables back to default
     def export_csv(self):
+        spec = self.env['cleaner.spec'].search([('parent.id', '=', self.id)])
+        self.cleaned_csv=spec.generate_csv(self.decode_file())
         res = self.download_cleaned_csv()
-        self.file_loaded = False
+        self.file_loaded = 'not_loaded'
         self.file = None
         return res
 
     # Generate the CSV file from the cleaned data and execute download
     def download_cleaned_csv(self):
-        self.exportable_csv = base64.b64encode(bytes(self.cleaned_csv, encoding='utf8'))
+        self.exportable_csv = b64encode(bytes(self.cleaned_csv, encoding='utf8'))
         return {
             'name': 'FEC',
             'type': 'ir.actions.act_url',

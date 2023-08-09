@@ -30,9 +30,10 @@ class CleanerSpec(models.TransientModel):
         self.cols = ','.join(map(str, data.fieldnames))
         self.cols = self.cols[:-1]
 
-        # Delete existing elements
-    
-        
+        #Delete existing elements
+        for old in arch.findall(".//input[@class='cleaner_spec_inl_el']") + arch.findall(".//h6[@class='cleaner_spec_inl_el']"):
+            arch.remove(old)
+            
         # Build variable number of fields
         for index, field_name in enumerate(self.cols.split(','), start=1):
             field = etree.Element('input', {'type': 'checkbox', 'id': f'attr{index}', 'class': 'cleaner_spec_inl_el'})

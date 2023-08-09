@@ -10,44 +10,28 @@ class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation wizard'
 
+    # Fields to hold the values extracted from dirty data
     cols = fields.Char(string='Columns', default='')
     attrs = fields.Char(string='Attributes', default='')
     vals = fields.Char(string='Values', default='')
     
     # Process dirty data into correct structure for exporting
-    # Group attributes by product:
-    # [
-    #   prod1: {
-    #       attr1: [val1, val2, val3],
-    #       attr2: [val4, val5]
-    #   },
-    #   prod2: {
-    #       attr1: [val1, val6, val7],
-    #       attr2: [val5, val8]
-    #   },
-    # ]
     def process_data(self, buf):
         self.cols = self.attrs = self.vals = ''
         data = DictReader(buf)
         self.process_headers(data)
 
+    # Add variable number of column names to wizard
     def process_headers(self, data):
-        # Add variable number of column names to wizard
         fields_view = self.env.ref('data_cleaner.view_cleaner_spec_form')
         arch = etree.fromstring(fields_view.arch)
 
-        # Loop through all row headers and determine which stores the product, and which are attributes
-        for header in data.fieldnames:
-            # Trigger if column is attribute
-            if True: self.attrs += header + ','
-            # Add header to list of column names
-            self.cols += header + ','
-
-        # Strip trailing commas
-        self.attrs = self.attrs[:-1]
+        # Add all headers to the column list and strip trailing comma
+        self.cols = ','.join(map(str, data.fieldnames))
         self.cols = self.cols[:-1]
 
         # Delete existing elements
+    
         
         # Build variable number of fields
         for index, field_name in enumerate(self.cols.split(','), start=1):
@@ -60,6 +44,18 @@ class CleanerSpec(models.TransientModel):
 
         # Assign variable number of fields architecture to the view
         fields_view.arch = etree.tostring(arch)
+
+    # Update attribute list when form is saved
+    def write(self, cr, uid, ids, vals, context=None):
+        for header in self.cols:
+            # Trigger if column header represents an attribute
+            if True: 
+                self.attrs += header + ','
+
+        # Strip trailing commas
+        self.attrs = self.attrs[:-1]
+
+        return super('CleanerSpec', self).write(cr, uid, ids, vals, context=context)
 
     # Generate clean csv file for importing
     def generate_csv(self, data):

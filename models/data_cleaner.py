@@ -24,7 +24,7 @@ class DataCleaner(models.Model):
         spec = self.env['cleaner.spec'].create({})
         spec.process_data(data)
         return {
-            'name': 'data.mapping.wizard',
+            'name': 'Select Columns that are Product Attributes',
             'type': 'ir.actions.act_window',
             'res_model': 'cleaner.spec',
             'view_mode': 'form',

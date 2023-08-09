@@ -11,6 +11,8 @@ class DataCleaner(models.Model):
     csv_data = fields.Char(string="Unformatted CSV Data")
     cleaned_csv = fields.Char(default='Test')
     exportable_csv = fields.Binary()
+
+    specs = fields.Many2one(comodel_name='cleaner.spec', string='Cleaner Specs')
     
     # Update loaded status for field visibility
     @api.onchange('file')
@@ -20,9 +22,8 @@ class DataCleaner(models.Model):
     # Load data and build wizard
     def open_wizard(self):
         self.ensure_one
-        data = self.decode_file()
-        spec = self.env['cleaner.spec'].create({})
-        spec.process_data(data)
+        spec = self.env['cleaner.spec'].create({'parent': self})
+        spec.process_data(self.decode_file())
         return {
             'name': 'Select Columns that are Product Attributes',
             'type': 'ir.actions.act_window',
@@ -38,7 +39,7 @@ class DataCleaner(models.Model):
 
     # Export the formatted file and set variables back to default
     def export_csv(self):
-        spec = self.env['cleaner.spec'].create({})
+        spec = self.env['cleaner.spec'].search([('parent.id', '=', self.id)])
         self.cleaned_csv=spec.generate_csv(self.decode_file())
         res = self.download_cleaned_csv()
         self.file_loaded = 'not_loaded'

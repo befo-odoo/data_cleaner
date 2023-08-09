@@ -6,9 +6,11 @@ import json
 import pandas as pd
 import io
 
-class CleanerSpec(models.TransientModel):
+class CleanerSpec(models.Model):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation wizard'
+    
+    parent = fields.One2many(comodel_name='data.cleaner', inverse_name='specs', string='Parent Object')
 
     # Fields to hold the values extracted from dirty data
     cols = fields.Char(string='Columns', default='')
@@ -16,22 +18,17 @@ class CleanerSpec(models.TransientModel):
     vals = fields.Char(string='Values', default='')
     
     # Process dirty data into correct structure for exporting
-    def process_data(self, buf):
-        self.cols = self.attrs = self.vals = ''
-        data = DictReader(buf)
-        self.process_headers(data)
-
-    # Add variable number of column names to wizard
-    def process_headers(self, data):
+    def process_data(self, sio):
         fields_view = self.env.ref('data_cleaner.view_cleaner_spec_form')
         arch = etree.fromstring(fields_view.arch)
 
         # Add all headers to the column list and strip trailing comma
-        self.cols = ','.join(map(str, data.fieldnames))
+        line = sio.readline
+        self.cols = sio.readline().split(',')
         self.cols = self.cols[:-1]
 
         #Delete existing elements
-        for old in arch.findall(".//input[@class='cleaner_spec_inl_el']") + arch.findall(".//h6[@class='cleaner_spec_inl_el']"):
+        for old in arch.findall(".//*[@class='cleaner_spec_inl_el']"):
             arch.remove(old)
             
         # Build variable number of fields
@@ -41,36 +38,36 @@ class CleanerSpec(models.TransientModel):
             label = etree.Element('h6', {'class': 'cleaner_spec_inl_el'})
             label.text = field_name
             arch.append(label)
-            arch.append(etree.Element('br'))
+            arch.append(etree.Element('br', {'class': 'cleaner_spec_inl_el'}))
 
         # Assign variable number of fields architecture to the view
         fields_view.arch = etree.tostring(arch)
 
     # Update attribute list when form is saved
-    def write(self, cr, uid, ids, vals, context=None):
+    def confirm_mappings(self):
         for header in self.cols:
             # Trigger if column header represents an attribute
-            if True: 
-                self.attrs += header + ','
+            self.attrs += header + ','
 
         # Strip trailing commas
         self.attrs = self.attrs[:-1]
 
-        return super('CleanerSpec', self).write(cr, uid, ids, vals, context=context)
+    def generate_csv(self, sio):
+        return self._traverse_csv(sio, self.attrs, self.vals)
 
-    # Generate clean csv file for importing
-    def generate_csv(self, data):
+    # Perform operations to clean the data
+    def _traverse_csv(self, sio, attribute_array, values_array):
         print("Cleaning data")
-        df = pd.read_csv(data, sep="\t")
-        attribute_array = ["Manufacturer",
-                           "Collection",
-                           "Color",
-                           "Vendor_SKU",
-                           "Designer",
-                           "Fabric_Type",
-                           "Fiber_Contents",
-                           "Fabric_Width",
-                           "Putup_Format"]
+        df = pd.read_csv(sio, sep="\t")
+        # attribute_array = ["Manufacturer",
+        #                    "Collection",
+        #                    "Color",
+        #                    "Vendor_SKU",
+        #                    "Designer",
+        #                    "Fabric_Type",
+        #                    "Fiber_Contents",
+        #                    "Fabric_Width",
+        #                    "Putup_Format"]
         new_col_list = [col_name for col_name in df.columns.values if col_name not in attribute_array]
         updated_col_list = new_col_list.copy()
         updated_col_list.extend(["Attribute", "Values"])
@@ -80,10 +77,12 @@ class CleanerSpec(models.TransientModel):
             for col in new_col_list:
                 df_dict[col].append(row[col])
             df_dict['Attribute'].append(attribute_array[0])
-            df_dict['Values'].append(row[attribute_array[0]])
+            df_dict['Values'].append(row[values_array[0]])
+            # df_dict['Values'].append(row[attribute_array[0]])
             for i in range(1, len(attribute_array)):
                 df_dict['Attribute'].append(attribute_array[i])
-                df_dict['Values'].append(row[attribute_array[i]])
+                df_dict['Values'].append(row[values_array[i]])
+                # df_dict['Values'].append(row[attribute_array[i]])
                 for col in new_col_list:
                     df_dict[col].append('')
                 

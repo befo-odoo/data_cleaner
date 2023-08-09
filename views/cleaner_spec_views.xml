@@ -8,10 +8,11 @@
             <field name="arch" type="xml">
                <form>
                     <group>
+                        <separator string="Product Header"/>
                         <field name='product_header'/>
                     </group>
                     <group>
-                        <field name="cols" widget="html" options='{"rendering": "raw"}'/>
+                        <separator string="Product Attributes"/>
                     </group>
                 </form>
             </field>

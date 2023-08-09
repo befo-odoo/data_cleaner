@@ -10,7 +10,6 @@ class CleanerSpec(models.TransientModel):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation wizard'
 
-    product_header = fields.Many2one(comodel_name='cleaner.spec.column', string="Product Column Header", ondelete='cascade')
     cols = fields.Char(string='Columns', default='')
     attrs = fields.Char(string='Attributes', default='')
     vals = fields.Char(string='Values', default='')
@@ -39,19 +38,16 @@ class CleanerSpec(models.TransientModel):
 
         # Loop through all row headers and determine which stores the product, and which are attributes
         for header in data.fieldnames:
-            # Trigger if column is product header
-            if True: self.product_header = header
             # Trigger if column is attribute
             if True: self.attrs += header + ','
             # Add header to list of column names
             self.cols += header + ','
 
-        # Set domain of the product header field to all available columns
-        # self.product_header = [(col, col) for col in self.cols]
-
         # Strip trailing commas
         self.attrs = self.attrs[:-1]
         self.cols = self.cols[:-1]
+
+        # Delete existing elements
         
         # Build variable number of fields
         for index, field_name in enumerate(self.cols.split(','), start=1):
@@ -64,10 +60,6 @@ class CleanerSpec(models.TransientModel):
 
         # Assign variable number of fields architecture to the view
         fields_view.arch = etree.tostring(arch)
-
-    def _get_headers(self):
-        if self.cols:
-            return self.cols
 
     # Generate clean csv file for importing
     def generate_csv(self, data):

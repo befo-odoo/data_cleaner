@@ -41,6 +41,8 @@ class DataCleaner(models.Model):
 
     # Export the formatted file and set variables back to default
     def export_csv(self):
+        spec = self.env['cleaner.spec'].create({})
+        self.cleaned_csv=spec.generate_csv(self.decode_file())
         res = self.download_cleaned_csv()
         self.file_loaded = 'not_loaded'
         self.file = None

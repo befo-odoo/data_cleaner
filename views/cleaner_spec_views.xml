@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                <form>
                     <group>
-
+                        
                     </group>
                     <footer>
                         <button name="confirm_mappings" string="Confirm" class="btn-primary" type="object"/>

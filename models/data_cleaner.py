@@ -13,6 +13,7 @@ class DataCleaner(models.Model):
     exportable_csv = fields.Binary()
 
     specs = fields.Many2one(comodel_name='cleaner.spec', string='Cleaner Specs')
+    attrs = fields.Char(string='Spec Attributes', default='')
     
     # Update loaded status for field visibility
     @api.onchange('file')
@@ -30,6 +31,7 @@ class DataCleaner(models.Model):
             'res_model': 'cleaner.spec',
             'view_mode': 'form',
             'view_id': self.env.ref('data_cleaner.view_cleaner_spec_form').id,
+            'res_id': spec.id,
             'target': 'new',
         }
 
@@ -40,7 +42,7 @@ class DataCleaner(models.Model):
     # Export the formatted file and set variables back to default
     def export_csv(self):
         spec = self.env['cleaner.spec'].search([('parent.id', '=', self.id)])
-        self.cleaned_csv=spec.generate_csv(self.decode_file())
+        self.cleaned_csv=spec.generate_csv(self.decode_file(), self.attrs)
         res = self.download_cleaned_csv()
         self.file_loaded = 'not_loaded'
         self.file = None

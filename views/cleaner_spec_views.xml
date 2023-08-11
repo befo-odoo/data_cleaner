@@ -8,12 +8,13 @@
             <field name="arch" type="xml">
                <form>
                     <group>
-                        <separator string="Product Header"/>
-                        <field name='product_header'/>
                     </group>
-                    <group>
-                        <separator string="Product Attributes"/>
-                    </group>
+                    <footer>
+                        <button name="confirm_mappings" string="Confirm" class="btn-primary" type="object"/>
+                        <br/>
+                        <h6>Selected Attributes: </h6>
+                        <field name='attrs' readonly='1'/>
+                    </footer>
                 </form>
             </field>
         </record>

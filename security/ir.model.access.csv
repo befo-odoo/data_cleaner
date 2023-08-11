@@ -1,5 +1,3 @@
 id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
-registry_admin_rule_1,data cleaner admin,model_data_cleaner,group_cleaner_admin,1,1,1,1
-registry_user_rule_2,data cleaner user,model_data_cleaner,group_cleaner_user,1,0,1,0
-registry_user_rule_3,cleaner spec admin,model_cleaner_spec,group_cleaner_admin,1,1,1,1
-registry_user_rule_4,cleaner spec user,model_cleaner_spec,group_cleaner_user,1,0,1,0
+registry_admin_rule_1,data cleaner admin,model_data_cleaner,base.group_user,1,1,1,1
+registry_user_rule_3,cleaner spec admin,model_cleaner_spec,base.group_user,1,1,1,1

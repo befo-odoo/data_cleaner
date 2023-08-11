@@ -1,9 +1,15 @@
 # Data Cleaner Tool
 
-The data cleaner module is designed to automate the process of cleaning client data, specifically product variants (attributes and values)
+The Data Cleaner application is designed to automate the process of cleaning client data, specifically product variants (attributes and values)
 
 ## Usage
 
-To use the data cleaner, install the ```data_cleaning``` module from apps.
+#### Installation
 
-From there, upload a file, and then open the column mapping wizard by clicking the ```Map Fields``` button. Mark all of the columns that are attributes, and then close the wizard. Now, the file can be exported and all selected attributes will be formatted properly in the cleaned csv file.
+To access the data cleaner, the applicationr needs to be added to the ```--addons-path``` command line argument. Find the path of the parent diretory of where your ```data_cleaner``` is located, and append it to the ```--addons-path``` argument from where your instance of Odoo is started.
+
+Next, install the ```data_cleaning``` module on your database from Apps.
+
+#### Running the Tool
+
+Once installed, the application can be opened. In the Data Cleaner application, upload a file, and then open the column mapping wizard by clicking the ```Map Fields``` button. Select all of the columns that are attributes, and then click ```Confirm``` to exit the wizard. Now, the file can be exported and all selected attributes will be formatted properly in the cleaned csv file.

@@ -23,7 +23,8 @@ class CleanerSpec(models.Model):
 
         # Add all headers to the column list and strip undesired characters
         self.cols = sio.readline().replace('"', '').replace('\r\n', '')
-        # Delete existing elements
+
+        # Delete old existing elements
         for old in arch.findall(".//*[@class='cleaner_spec_inl_el']"):
             arch.remove(old)
         for old in arch.findall(".//*[@name='confirm_attr']"):
@@ -54,7 +55,6 @@ class CleanerSpec(models.Model):
         # Add attribute to attr list
         if field not in self.attrs:
             self.attrs += field + ','
-            pass
 
         # Update view with changes
         fields_view.arch = etree.tostring(arch)
@@ -77,7 +77,7 @@ class CleanerSpec(models.Model):
         attribute_array = attribute_array.split(',')
         if attribute_array[-1] == '':
             attribute_array = attribute_array[:-1]
-        df = pd.read_csv(sio, sep="\t")
+        df = pd.read_csv(sio, sep=",")
         if len(df.columns.values) == 1:
             all_cols = df.columns.values[0].split(',')
         else: #len(all_cols) > 1

@@ -43,10 +43,7 @@ class DataCleaner(models.Model):
     def export_csv(self):
         spec = self.env['cleaner.spec'].search([('parent.id', '=', self.id)])
         self.cleaned_csv=spec.generate_csv(self.decode_file(), self.attrs)
-        res = self.download_cleaned_csv()
-        self.file_loaded = 'not_loaded'
-        self.file = None
-        return res
+        return self.download_cleaned_csv()
 
     # Generate the CSV file from the cleaned data and execute download
     def download_cleaned_csv(self):

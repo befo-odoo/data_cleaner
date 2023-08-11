@@ -10,12 +10,11 @@ class CleanerSpec(models.Model):
     _name = 'cleaner.spec'
     _description = 'data cleaner specificiation wizard'
     
-    parent = fields.One2many(comodel_name='data.cleaner', inverse_name='specs', string='Parent Object')
-    rendering_trigger = fields.Boolean(string='Flag to rerender the wizard view', compute='_compute_rendering_trigger', default=False)
 
     # Fields to hold the values extracted from dirty data
     cols = fields.Char(string='Columns', default='')
     attrs = fields.Char(string='Attributes', default='')
+    parent = fields.One2many(comodel_name='data.cleaner', inverse_name='specs', string='Parent Object')
     
     # Process dirty data into correct structure for exporting
     def process_data(self, sio):
@@ -27,7 +26,7 @@ class CleanerSpec(models.Model):
         # Delete existing elements
         for old in arch.findall(".//*[@class='cleaner_spec_inl_el']"):
             arch.remove(old)
-        for old in arch.findall(".//*[@name='onfirm_attr']"):
+        for old in arch.findall(".//*[@name='confirm_attr']"):
             arch.remove(old)
             
         # Build variable number of fields
@@ -35,7 +34,7 @@ class CleanerSpec(models.Model):
             button = etree.Element('button', {'class': f'cleaner_spec_inl_el btn-secondary button_{index}', 
                                                  'type': 'object', 
                                                  'name': 'confirm_attr', 
-                                                 'string': 'Not Selected',
+                                                 'string': 'Add',
                                                  'args': [index, field_name],
                                                 })
             arch.append(button)
@@ -47,36 +46,18 @@ class CleanerSpec(models.Model):
         # Assign variable number of fields architecture to the view
         fields_view.arch = etree.tostring(arch)
 
+    
     def confirm_attr(self, index, field):
-
         fields_view = self.env.ref('data_cleaner.view_cleaner_spec_form')
         arch = etree.fromstring(fields_view.arch)
 
-        # Toggle button status
-        btn = arch.find(f".//button[@class='cleaner_spec_inl_el btn-secondary button_{index}']")
-        if btn is not None:
-            # Button currently not selected
-            btn.set('string', 'Selected')
-            classes = btn.get('class', '').split()
-            classes.remove('btn-secondary')
-            classes.append('btn-primary')
-            btn.set('class', ' '.join(classes))
-        else:
-            # Button currently selected [@class='cleaner_spec_inl_el btn-primary button_{index}']
-            btns = arch.findall(f".//button")
-            btn = list(filter(lambda b: str(index) in b.attrib['class'], btns))[0]
-            btn.set('string', 'Not selected')
-            classes = btn.get('class', '').split()
-            classes.remove('btn-primary')
-            classes.append('btn-secondary')
-            btn.set('class', ' '.join(classes))
-
         # Add attribute to attr list
-        self.attrs += field + ','
+        if field not in self.attrs:
+            self.attrs += field + ','
+            pass
 
         # Update view with changes
         fields_view.arch = etree.tostring(arch)
-
 
         return {
             'name': 'Select Columns that are Product Attributes',
@@ -86,42 +67,34 @@ class CleanerSpec(models.Model):
             'res_id': self.id,
             'target': 'new',
         }
-    
-    @api.depends('attrs')
-    def _compute_rendering_trigger(self):
-        self.rendering_trigger = not self.rendering_trigger
 
     # Update attribute list when form is saved
     def confirm_mappings(self):
-        fields_view = self.env.ref('data_cleaner.view_cleaner_spec_form')
-        arch = etree.fromstring(fields_view.arch)
-        # Trigger if column header represents an attribute
-        for element in arch.findall(".//*[@class='checked']"):
-            if True: #element.get('checked') == 'checked':
-                print(element.text)
-                self.attrs += element + ','
+        self.parent.attrs = self.attrs
 
-        # Strip trailing commas
-        self.attrs = self.attrs[:-1]
-
-    def generate_csv(self, sio):
-        return self._traverse_csv(sio, ['Vendor', 'Unit of Measure']) #TEST DATA with correct structure
-        #return self._traverse_csv(sio, self.attrs)
-
-    # Perform operations to clean the data
-    def _traverse_csv(self, sio, attribute_array):
+    def generate_csv(self, sio, attribute_array):
         print("Cleaning data")
+        attribute_array = attribute_array.split(',')
+        if attribute_array[-1] == '':
+            attribute_array = attribute_array[:-1]
         df = pd.read_csv(sio, sep="\t")
-        new_col_list = [col_name for col_name in df.columns.values if col_name not in attribute_array]
+        if len(df.columns.values) == 1:
+            all_cols = df.columns.values[0].split(',')
+        else: #len(all_cols) > 1
+            all_cols = df.columns.values
+        new_col_list = [col_name for col_name in all_cols if col_name not in attribute_array]
         updated_col_list = new_col_list.copy()
         updated_col_list.extend(["Attribute", "Values"])
         df_dict = {c: [] for c in updated_col_list}
         for index, row in df.iterrows():
             print("Processing Row " + str(index))
+            if len(row) == 1:
+                row = {col: val for col,val in zip(row.keys()[0].split(','), row.keys()[0].split(','))}
             for col in new_col_list:
                 df_dict[col].append(row[col])
-            df_dict['Attribute'].append(attribute_array[0])
-            df_dict['Values'].append(row[attribute_array[0]])
+            if len(attribute_array) > 0:
+                df_dict['Attribute'].append(attribute_array[0])
+                df_dict['Values'].append(row[attribute_array[0]])
             for i in range(1, len(attribute_array)):
                 df_dict['Attribute'].append(attribute_array[i])
                 df_dict['Values'].append(row[attribute_array[i]])

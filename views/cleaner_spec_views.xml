@@ -8,10 +8,12 @@
             <field name="arch" type="xml">
                <form>
                     <group>
-                        
                     </group>
                     <footer>
                         <button name="confirm_mappings" string="Confirm" class="btn-primary" type="object"/>
+                        <br/>
+                        <h6>Selected Attributes: </h6>
+                        <field name='attrs' readonly='1'/>
                     </footer>
                 </form>
             </field>

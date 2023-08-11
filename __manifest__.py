@@ -16,11 +16,7 @@
         'web.assets_common': [
             'data_cleaner/static/src/css/cleaner_spec.css',
         ],
-        'web.assets_backend': [
-            'data_cleaner/static/src/js/buttons.js',
-        ]
     },
-    'qweb': [ 'static/src/xml/buttons.xml' ],
     'license': 'LGPL-3',
     'website': 'www.odoo.com',
     'application': True,
